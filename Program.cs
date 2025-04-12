@@ -1,3 +1,5 @@
+using backend.AnimeNexus.API.Features.Auth;
+using backend.AnimeNexus.API.Features.Auth.Interfaces;
 using backend.AnimeNexus.API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +14,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddControllers();
 
