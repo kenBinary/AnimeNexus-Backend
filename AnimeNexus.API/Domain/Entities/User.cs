@@ -1,8 +1,12 @@
-namespace AnimeNexus.API.Domain.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class User
+namespace backend.AnimeNexus.API.Domain.Entities
 {
-    public int UserId { get; set; }
-    public required string UserName { get; set; }
-    public required string PasswordHash { get; set; }
+    public class User
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public required Guid UserId { get; set; }
+        public required string UserName { get; set; }
+        public required string PasswordHash { get; set; }
+    }
 }

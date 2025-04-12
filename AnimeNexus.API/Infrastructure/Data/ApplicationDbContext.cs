@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using AnimeNexus.API.Domain.Entities;
+using backend.AnimeNexus.API.Domain.Entities;
 
 namespace backend.AnimeNexus.API.Infrastructure.Data
 {
