@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using backend.AnimeNexus.API.Domain.Entities;
 using backend.AnimeNexus.API.Features.Auth.Interfaces;
 using backend.AnimeNexus.API.Infrastructure.Data;
@@ -18,7 +14,7 @@ namespace backend.AnimeNexus.API.Features.Auth
             _context = context;
         }
 
-        public async Task AddUser(string userName, string passwordHash)
+        public async Task<User> AddUser(string userName, string passwordHash)
         {
             var user = new User
             {
@@ -29,14 +25,16 @@ namespace backend.AnimeNexus.API.Features.Auth
             _context.Users.Add(user);
 
             await _context.SaveChangesAsync();
+
+            return user;
         }
 
-
-        public async Task<User?> GetUser(string userName, string passwordHash)
+        public async Task<User?> GetUserByUsernameAsync(string userName)
         {
             return await _context.Users
-                .FirstOrDefaultAsync(u => u.UserName == userName && u.PasswordHash == passwordHash);
+                .FirstOrDefaultAsync(u => u.UserName == userName);
         }
+
         public async Task UpdateUser(User user)
         {
             _context.Users.Update(user);
