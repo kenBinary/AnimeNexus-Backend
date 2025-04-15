@@ -1,0 +1,147 @@
+using System.Text.Json;
+using System.Web;
+using AnimeNexus.API.Infrastructure.Models.Jikan;
+using backend.AnimeNexus.API.Domain.DTO.Request;
+using backend.AnimeNexus.API.Infrastructure.Interfaces;
+using backend.AnimeNexus.API.Utils;
+
+namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
+{
+    public class JikanApiClient : IJikanApiClient
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<JikanApiClient> _logger;
+
+        private const string JikanApiBaseUrl = "https://api.jikan.moe/v4/";
+
+        public JikanApiClient(IHttpClientFactory httpClientFactory, ILogger<JikanApiClient> logger)
+        {
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        // Gets the full details of an anime
+        // https://api.jikan.moe/v4/anime/{id} (https://docs.api.jikan.moe/#tag/anime/operation/getAnimeFullById)
+        public async Task<AnimeResponse?> GetAnimeDataFull(int id)
+        {
+            if (id <= 0)
+            {
+                _logger.LogWarning("Invalid anime ID provided: {AnimeId}", id);
+                return null;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            var requestUri = $"{JikanApiBaseUrl}anime/{id}/full";
+
+            try
+            {
+                _logger.LogInformation("Requesting full anime data for ID: {AnimeId} from {RequestUri}", id, requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var animeResponse = await response.Content.ReadFromJsonAsync<AnimeResponse>();
+
+                if (animeResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize response for anime ID: {AnimeId}", id);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved full anime data for ID: {AnimeId}", id);
+                }
+
+                return animeResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching anime data for ID: {AnimeId} from {RequestUri}", id, requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for anime ID: {AnimeId} from {RequestUri}", id, requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching anime data for ID: {AnimeId}", id);
+                return null;
+            }
+        }
+
+        // Gets a list of anime
+        // https://api.jikan.moe/v4/anime (https://docs.api.jikan.moe/#tag/anime/operation/getAnimeSearch)
+        public async Task<AnimeListResponse?> GetAnime(AnimeSearchQueryParameters queryParams)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var queryString = BuildQueryString(queryParams);
+            var requestUri = $"{JikanApiBaseUrl}anime{queryString}";
+
+            try
+            {
+                _logger.LogInformation("Requesting anime list from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var animeListResponse = await response.Content.ReadFromJsonAsync<AnimeListResponse>();
+
+                if (animeListResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize anime list response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved anime list from {RequestUri}", requestUri);
+                }
+
+                return animeListResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching anime list from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for anime list from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching anime list from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        // see https://docs.api.jikan.moe/#tag/anime/operation/getAnimeSearch for what these parameters mean
+        private string BuildQueryString(AnimeSearchQueryParameters queryParams)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+
+            if (queryParams.Unapproved.HasValue && queryParams.Unapproved.Value) query["unapproved"] = null;
+            if (queryParams.Page.HasValue) query["page"] = queryParams.Page.Value.ToString();
+            if (queryParams.Limit.HasValue) query["limit"] = queryParams.Limit.Value.ToString();
+            if (!string.IsNullOrWhiteSpace(queryParams.Q)) query["q"] = queryParams.Q;
+            if (queryParams.Type.HasValue) query["type"] = queryParams.Type.Value.GetDescription();
+            if (queryParams.Score.HasValue) query["score"] = queryParams.Score.Value.ToString();
+            if (queryParams.MinScore.HasValue) query["min_score"] = queryParams.MinScore.Value.ToString();
+            if (queryParams.MaxScore.HasValue) query["max_score"] = queryParams.MaxScore.Value.ToString();
+            if (queryParams.Status.HasValue) query["status"] = queryParams.Status.Value.GetDescription();
+            if (queryParams.Rating.HasValue) query["rating"] = queryParams.Rating.Value.GetDescription();
+            if (queryParams.Sfw.HasValue && queryParams.Sfw.Value) query["sfw"] = null;
+            if (!string.IsNullOrWhiteSpace(queryParams.Genres)) query["genres"] = queryParams.Genres;
+            if (!string.IsNullOrWhiteSpace(queryParams.GenresExclude)) query["genres_exclude"] = queryParams.GenresExclude;
+            if (queryParams.OrderBy.HasValue) query["order_by"] = queryParams.OrderBy.Value.GetDescription();
+            if (queryParams.Sort.HasValue) query["sort"] = queryParams.Sort.Value.GetDescription();
+            if (!string.IsNullOrWhiteSpace(queryParams.Letter)) query["letter"] = queryParams.Letter;
+            if (!string.IsNullOrWhiteSpace(queryParams.Producers)) query["producers"] = queryParams.Producers;
+            if (!string.IsNullOrWhiteSpace(queryParams.StartDate)) query["start_date"] = queryParams.StartDate;
+            if (!string.IsNullOrWhiteSpace(queryParams.EndDate)) query["end_date"] = queryParams.EndDate;
+
+            string? queryString = query.ToString();
+            return string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}";
+        }
+    }
+}
