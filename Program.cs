@@ -7,6 +7,10 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using backend.AnimeNexus.API.Infrastructure.Interfaces;
+using backend.AnimeNexus.API.Infrastructure.ExternalServices;
+using backend.AnimeNexus.API.Features.Anime.Interfaces;
+using backend.AnimeNexus.API.Features.Anime.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,9 +56,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IJikanApiClient, JikanApiClient>();
+builder.Services.AddScoped<IAnimeService, AnimeService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddHttpClient();
 
 // --- JWT Configuration ---
 var jwtSettings = builder.Configuration.GetSection("Jwt");
