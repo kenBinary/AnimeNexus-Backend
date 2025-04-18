@@ -1,6 +1,7 @@
 using AnimeNexus.API.Infrastructure.Models.Jikan;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
+using AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
 
 namespace backend.AnimeNexus.API.Infrastructure.Interfaces
 {
@@ -14,6 +15,9 @@ namespace backend.AnimeNexus.API.Infrastructure.Interfaces
 
         // https://api.jikan.moe/v4/recommendations/anime
         Task<RecommendationResponse?> GetAnimeRecommendations(int? page = null);
+
+        // https://api.jikan.moe/v4/random/anime
+        Task<RandomAnimeResponse?> GetRandomAnime();
 
     }
 }

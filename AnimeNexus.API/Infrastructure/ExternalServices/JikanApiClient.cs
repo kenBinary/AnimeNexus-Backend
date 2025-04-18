@@ -5,6 +5,7 @@ using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Infrastructure.Interfaces;
 using backend.AnimeNexus.API.Utils;
+using AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
 
 namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
 {
@@ -195,6 +196,50 @@ namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
 
             string? queryString = query.ToString();
             return string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}";
+        }
+
+        // Gets a random anime
+        // https://api.jikan.moe/v4/random/anime (https://docs.api.jikan.moe/#tag/random/operation/getRandomAnime)
+        public async Task<RandomAnimeResponse?> GetRandomAnime()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var requestUri = $"{JikanApiBaseUrl}random/anime";
+
+            try
+            {
+                _logger.LogInformation("Requesting random anime from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var randomAnimeResponse = await response.Content.ReadFromJsonAsync<RandomAnimeResponse>();
+
+                if (randomAnimeResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize random anime response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved random anime from {RequestUri}", requestUri);
+                }
+
+                return randomAnimeResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching random anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for random anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching random anime from {RequestUri}", requestUri);
+                return null;
+            }
         }
     }
 }
