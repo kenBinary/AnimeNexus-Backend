@@ -62,6 +62,20 @@ namespace backend.AnimeNexus.API.Domain.DTO.Request
         Rx
     }
 
+    /*
+    Mapping for AnimeSearchOrderBy enum values (for reference):
+    0: mal_id
+    1: title
+    2: start_date
+    3: end_date
+    4: episodes
+    5: score
+    6: scored_by
+    7: rank
+    8: popularity
+    9: members
+    10: favorites
+    */
     public enum AnimeSearchOrderBy
     {
         [Description("mal_id")]
@@ -137,6 +151,29 @@ namespace backend.AnimeNexus.API.Domain.DTO.Request
         /// <summary>
         /// Filter by comma-separated genre IDs (inclusive).
         /// Bind from query parameter "genres".
+        /// Available Genre IDs:
+        /// 1: Action
+        /// 2: Adventure
+        /// 5: Avant Garde
+        /// 46: Award Winning
+        /// 28: Boys Love
+        /// 4: Comedy
+        /// 8: Drama
+        /// 10: Fantasy
+        /// 26: Girls Love
+        /// 47: Gourmet
+        /// 14: Horror
+        /// 7: Mystery
+        /// 22: Romance
+        /// 24: Sci-Fi
+        /// 36: Slice of Life
+        /// 30: Sports
+        /// 37: Supernatural
+        /// 41: Suspense
+        /// 9: Ecchi
+        /// 49: Erotica
+        /// 12: Hentai
+        /// Example: genres=1,4,22
         /// </summary>
         [FromQuery(Name = "genres")]
         public string? Genres { get; set; }
