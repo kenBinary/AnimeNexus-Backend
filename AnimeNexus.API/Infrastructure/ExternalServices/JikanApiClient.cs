@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Web;
 using AnimeNexus.API.Infrastructure.Models.Jikan;
+using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Infrastructure.Interfaces;
 using backend.AnimeNexus.API.Utils;
@@ -111,6 +112,58 @@ namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while fetching anime list from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        // Gets anime recommendations
+        // (https://docs.api.jikan.moe/#tag/recommendations/operation/getRecentAnimeRecommendations)
+        public async Task<RecommendationResponse?> GetAnimeRecommendations(int? page = null)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var query = HttpUtility.ParseQueryString(string.Empty);
+
+            if (page.HasValue)
+            {
+                query["page"] = page.Value.ToString();
+            }
+
+            string? queryString = query.ToString();
+            var requestUri = $"{JikanApiBaseUrl}recommendations/anime{(string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}")}";
+
+            try
+            {
+                _logger.LogInformation("Requesting anime recommendations from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var recommendationResponse = await response.Content.ReadFromJsonAsync<RecommendationResponse>();
+
+                if (recommendationResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize recommendation response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved anime recommendations from {RequestUri}", requestUri);
+                }
+
+                return recommendationResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching anime recommendations from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for anime recommendations from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching anime recommendations from {RequestUri}", requestUri);
                 return null;
             }
         }

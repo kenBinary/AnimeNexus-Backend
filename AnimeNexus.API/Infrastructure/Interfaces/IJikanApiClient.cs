@@ -1,5 +1,6 @@
 using AnimeNexus.API.Infrastructure.Models.Jikan;
 using backend.AnimeNexus.API.Domain.DTO.Request;
+using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 
 namespace backend.AnimeNexus.API.Infrastructure.Interfaces
 {
@@ -10,6 +11,9 @@ namespace backend.AnimeNexus.API.Infrastructure.Interfaces
 
         // https://api.jikan.moe/v4/anime/{id}/full
         Task<AnimeResponse?> GetAnimeDataFull(int id);
+
+        // https://api.jikan.moe/v4/recommendations/anime
+        Task<RecommendationResponse?> GetAnimeRecommendations(int? page = null);
 
     }
 }
