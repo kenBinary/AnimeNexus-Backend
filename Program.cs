@@ -11,6 +11,8 @@ using backend.AnimeNexus.API.Infrastructure.Interfaces;
 using backend.AnimeNexus.API.Infrastructure.ExternalServices;
 using backend.AnimeNexus.API.Features.Anime.Interfaces;
 using backend.AnimeNexus.API.Features.Anime.Services;
+using backend.AnimeNexus.API.Features.Producer.Services;
+using backend.AnimeNexus.API.Features.Producer.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IJikanApiClient, JikanApiClient>();
 builder.Services.AddScoped<IAnimeService, AnimeService>();
+builder.Services.AddScoped<IProducerService, ProducerService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
