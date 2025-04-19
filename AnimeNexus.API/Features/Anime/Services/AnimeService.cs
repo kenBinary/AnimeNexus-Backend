@@ -78,6 +78,31 @@ namespace backend.AnimeNexus.API.Features.Anime.Services
             return await _jikanApiClient.GetAnime(queryParams);
         }
 
+        public async Task<AnimeListResponse?> GetAnimeByStudioAsync(int producerId, GetAnimeByStudioRequest queryParameters)
+        {
+            _logger.LogInformation("Searching anime with query with studio ID: {studio}", producerId);
+
+            var queryParams = new AnimeSearchQueryParameters
+            {
+                Producers = producerId.ToString(),
+                Page = queryParameters.Page,
+                Limit = queryParameters.Limit,
+                OrderBy = queryParameters.AnimeSearchOrderBy,
+                Sort = queryParameters.SortDirection,
+                Status = queryParameters.AnimeSearchStatus,
+            };
+
+            var animeList = await _jikanApiClient.GetAnime(queryParams);
+
+            return animeList;
+        }
+
+        public async Task<AnimeListResponse?> GetAnimeList(AnimeSearchQueryParameters queryParameters)
+        {
+
+            return await _jikanApiClient.GetAnime(queryParameters);
+        }
+
         public async Task<RecommendationResponse?> GetAnimeRecommendationsAsync(int? page = null)
         {
             _logger.LogInformation("Getting anime with recommendations");

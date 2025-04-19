@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AnimeNexus.API.Infrastructure.Models.Jikan;
 using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
@@ -40,6 +36,13 @@ namespace backend.AnimeNexus.API.Features.Anime.Interfaces
 
         // get a list of random anime
         Task<RandomAnimeList?> GetRandomAnimeListAsync(int count);
+
+        // Gets a list of animes
+        Task<AnimeListResponse?> GetAnimeList(AnimeSearchQueryParameters queryParameters);
+
+        // get animes of studio
+        // NOTE: we have to filter by 'studios' property because producer and studio is different
+        Task<AnimeListResponse?> GetAnimeByStudioAsync(int producerId, GetAnimeByStudioRequest queryParameters);
 
     }
 }
