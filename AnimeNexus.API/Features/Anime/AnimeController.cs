@@ -21,6 +21,19 @@ namespace backend.AnimeNexus.API.Features.Anime
             _animeService = animeService;
         }
 
+        [HttpGet("")]
+        public async Task<IActionResult> GetAnime(AnimeSearchQueryParameters queryParameters)
+        {
+            var animeList = await _animeService.GetAnimeList(queryParameters);
+
+            if (animeList == null)
+            {
+                return BadRequest("Failed to retrieve anime list.");
+            }
+
+            return Ok(animeList);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<AnimeResponse>> GetAnimeFull(int id)
         {
@@ -32,6 +45,19 @@ namespace backend.AnimeNexus.API.Features.Anime
             }
 
             return Ok(animeData);
+        }
+
+        [HttpGet("studio/{studioId}")]
+        public async Task<IActionResult> GetAnimeByStudio(int studioId, [FromQuery] GetAnimeByStudioRequest queryParameters)
+        {
+            var animeList = await _animeService.GetAnimeByStudioAsync(studioId, queryParameters);
+
+            if (animeList == null)
+            {
+                return BadRequest("An error occured while trying to request for the resource");
+            }
+
+            return Ok(animeList);
         }
 
         [HttpGet("genre/{genre}")]
