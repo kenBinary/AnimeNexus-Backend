@@ -1,11 +1,13 @@
 using backend.AnimeNexus.API.Domain.DTOs.Request;
 using backend.AnimeNexus.API.Features.Producer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.AnimeNexus.API.Features.Producer
 {
     [ApiController]
     [Route("api/producers")]
+    [Authorize]
     public class ProducerController : ControllerBase
     {
 
