@@ -1,4 +1,5 @@
 using AnimeNexus.API.Infrastructure.Models.Jikan;
+using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Features.Anime.DTO;
 using backend.AnimeNexus.API.Features.Anime.Interfaces;
@@ -22,13 +23,13 @@ namespace backend.AnimeNexus.API.Features.Anime
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetAnime(AnimeSearchQueryParameters queryParameters)
+        public async Task<ActionResult<AnimeListResponse>> GetAnime(AnimeSearchQueryParameters queryParameters)
         {
             var animeList = await _animeService.GetAnimeList(queryParameters);
 
             if (animeList == null)
             {
-                return BadRequest("Failed to retrieve anime list.");
+                return BadRequest("An error occured while trying to request for the resource");
             }
 
             return Ok(animeList);
@@ -41,14 +42,14 @@ namespace backend.AnimeNexus.API.Features.Anime
 
             if (animeData == null)
             {
-                return BadRequest("tralalelo tralala");
+                return BadRequest("An error occured while trying to request for the resource");
             }
 
             return Ok(animeData);
         }
 
         [HttpGet("studio/{studioId}")]
-        public async Task<IActionResult> GetAnimeByStudio(int studioId, [FromQuery] GetAnimeByStudioRequest queryParameters)
+        public async Task<ActionResult<AnimeListResponse>> GetAnimeByStudio(int studioId, [FromQuery] GetAnimeByStudioRequest queryParameters)
         {
             var animeList = await _animeService.GetAnimeByStudioAsync(studioId, queryParameters);
 
@@ -167,7 +168,7 @@ namespace backend.AnimeNexus.API.Features.Anime
         }
 
         [HttpGet("recommendations")]
-        public async Task<ActionResult<AnimeListResponse>> GetAnimeRecommendations([FromQuery] int? page = null)
+        public async Task<ActionResult<RecommendationResponse>> GetAnimeRecommendations([FromQuery] int? page = null)
         {
             var recommendationList = await _animeService.GetAnimeRecommendationsAsync(page);
 
@@ -180,7 +181,7 @@ namespace backend.AnimeNexus.API.Features.Anime
         }
 
         [HttpGet("random")]
-        public async Task<ActionResult<AnimeListResponse>> GetRandomAnimes([FromQuery] int count = 10)
+        public async Task<ActionResult<RandomAnimeList>> GetRandomAnimes([FromQuery] int count = 10)
         {
             var recommendationList = await _animeService.GetRandomAnimeListAsync(count);
 
