@@ -6,6 +6,8 @@ using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Infrastructure.Interfaces;
 using backend.AnimeNexus.API.Utils;
 using AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeProducer;
+using backend.AnimeNexus.API.Domain.DTOs.Request;
 
 namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
 {
@@ -240,6 +242,116 @@ namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
                 _logger.LogError(ex, "An unexpected error occurred while fetching random anime from {RequestUri}", requestUri);
                 return null;
             }
+        }
+
+        // Gets full producer details by ID
+        // https://api.jikan.moe/v4/producers/{id}/full (https://docs.api.jikan.moe/#tag/producers/operation/getProducerFullById)
+        public async Task<ProducerDataFullResponse?> GetAnimeProducerById(int id)
+        {
+            if (id <= 0)
+            {
+                _logger.LogWarning("Invalid producer ID provided: {ProducerId}", id);
+                return null;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            var requestUri = $"{JikanApiBaseUrl}producers/{id}/full";
+
+            try
+            {
+                _logger.LogInformation("Requesting full producer data for ID: {ProducerId} from {RequestUri}", id, requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var producerResponse = await response.Content.ReadFromJsonAsync<ProducerDataFullResponse>();
+
+                if (producerResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize response for producer ID: {ProducerId}", id);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved full producer data for ID: {ProducerId}", id);
+                }
+
+                return producerResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching producer data for ID: {ProducerId} from {RequestUri}", id, requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for producer ID: {ProducerId} from {RequestUri}", id, requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching producer data for ID: {ProducerId}", id);
+                return null;
+            }
+        }
+
+        // Gets a list of producers
+        // https://api.jikan.moe/v4/producers (https://docs.api.jikan.moe/#tag/producers/operation/getProducers)
+        public async Task<ProducerListResponse?> GetAnimeProducers(ProducerSearchQueryParameters queryParams)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var queryString = BuildProducerQueryString(queryParams);
+            var requestUri = $"{JikanApiBaseUrl}producers{queryString}";
+
+            try
+            {
+                _logger.LogInformation("Requesting producer list from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var producerListResponse = await response.Content.ReadFromJsonAsync<ProducerListResponse>();
+
+                if (producerListResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize producer list response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved producer list from {RequestUri}", requestUri);
+                }
+
+                return producerListResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching producer list from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for producer list from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching producer list from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        private string BuildProducerQueryString(ProducerSearchQueryParameters queryParams)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+
+            if (queryParams.Page.HasValue) query["page"] = queryParams.Page.Value.ToString();
+            if (queryParams.Limit.HasValue) query["limit"] = queryParams.Limit.Value.ToString();
+            if (!string.IsNullOrWhiteSpace(queryParams.Q)) query["q"] = queryParams.Q;
+            if (queryParams.OrderBy.HasValue) query["order_by"] = queryParams.OrderBy.Value.GetDescription();
+            if (queryParams.Sort.HasValue) query["sort"] = queryParams.Sort.Value.GetDescription();
+            if (!string.IsNullOrWhiteSpace(queryParams.Letter)) query["letter"] = queryParams.Letter;
+
+            string? queryString = query.ToString();
+            return string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}";
         }
     }
 }
