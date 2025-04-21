@@ -7,12 +7,15 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
 using backend.AnimeNexus.API.Infrastructure.Interfaces;
 using backend.AnimeNexus.API.Infrastructure.ExternalServices;
 using backend.AnimeNexus.API.Features.Anime.Interfaces;
 using backend.AnimeNexus.API.Features.Anime.Services;
 using backend.AnimeNexus.API.Features.Producer.Services;
 using backend.AnimeNexus.API.Features.Producer.Interfaces;
+using backend.AnimeNexus.API.Features.Season.Services;
+using backend.AnimeNexus.API.Features.Season.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +64,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IJikanApiClient, JikanApiClient>();
 builder.Services.AddScoped<IAnimeService, AnimeService>();
 builder.Services.AddScoped<IProducerService, ProducerService>();
+builder.Services.AddScoped<ISeasonService, SeasonService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
