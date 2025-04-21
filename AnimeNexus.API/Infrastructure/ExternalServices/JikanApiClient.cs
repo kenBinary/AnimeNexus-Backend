@@ -8,6 +8,7 @@ using backend.AnimeNexus.API.Utils;
 using AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
 using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeProducer;
 using backend.AnimeNexus.API.Domain.DTOs.Request;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeSeason;
 
 namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
 {
@@ -349,6 +350,211 @@ namespace backend.AnimeNexus.API.Infrastructure.ExternalServices
             if (queryParams.OrderBy.HasValue) query["order_by"] = queryParams.OrderBy.Value.GetDescription();
             if (queryParams.Sort.HasValue) query["sort"] = queryParams.Sort.Value.GetDescription();
             if (!string.IsNullOrWhiteSpace(queryParams.Letter)) query["letter"] = queryParams.Letter;
+
+            string? queryString = query.ToString();
+            return string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}";
+        }
+
+        // Gets the current season anime
+        // https://api.jikan.moe/v4/seasons/now (https://docs.api.jikan.moe/#tag/seasons/operation/getSeasonNow)
+        public async Task<GetCurrentSeasonResponse?> GetCurrentSeason(SeasonQueryParameters queryParameters)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var queryString = BuildSeasonQueryString(queryParameters);
+            var requestUri = $"{JikanApiBaseUrl}seasons/now{queryString}";
+
+            try
+            {
+                _logger.LogInformation("Requesting current season anime from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var currentSeasonResponse = await response.Content.ReadFromJsonAsync<GetCurrentSeasonResponse>();
+
+                if (currentSeasonResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize current season response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved current season anime from {RequestUri}", requestUri);
+                }
+
+                return currentSeasonResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching current season anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for current season anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching current season anime from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        // Gets anime for a specific season and year
+        // https://api.jikan.moe/v4/seasons/{year}/{season} (https://docs.api.jikan.moe/#tag/seasons/operation/getSeason)
+        public async Task<GetSeasonResponse?> GetSeason(int year, string season, SeasonQueryParameters queryParameters)
+        {
+            if (year <= 0)
+            {
+                _logger.LogWarning("Invalid year provided: {Year}", year);
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(season))
+            {
+                _logger.LogWarning("Invalid season provided: {Season}", season);
+                return null;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            var queryString = BuildSeasonQueryString(queryParameters);
+            var requestUri = $"{JikanApiBaseUrl}seasons/{year}/{season.ToLower()}{queryString}";
+
+            try
+            {
+                _logger.LogInformation("Requesting anime for {Season} {Year} from {RequestUri}", season, year, requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var seasonResponse = await response.Content.ReadFromJsonAsync<GetSeasonResponse>();
+
+                if (seasonResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize season response for {Season} {Year} from {RequestUri}", season, year, requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved anime for {Season} {Year} from {RequestUri}", season, year, requestUri);
+                }
+
+                return seasonResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching anime for {Season} {Year} from {RequestUri}", season, year, requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for {Season} {Year} from {RequestUri}", season, year, requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching anime for {Season} {Year}", season, year);
+                return null;
+            }
+        }
+
+        // Gets all available seasons
+        // https://api.jikan.moe/v4/seasons (https://docs.api.jikan.moe/#tag/seasons/operation/getSeasonsList)
+        public async Task<SeasonListResponse?> GetAvailableSeasons()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var requestUri = $"{JikanApiBaseUrl}seasons";
+
+            try
+            {
+                _logger.LogInformation("Requesting available seasons from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var seasonListResponse = await response.Content.ReadFromJsonAsync<SeasonListResponse>();
+
+                if (seasonListResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize available seasons response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved available seasons from {RequestUri}", requestUri);
+                }
+
+                return seasonListResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching available seasons from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for available seasons from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching available seasons from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        // Gets upcoming season anime
+        // https://api.jikan.moe/v4/seasons/upcoming (https://docs.api.jikan.moe/#tag/seasons/operation/getSeasonUpcoming)
+        public async Task<UpcomingSeasonResponse?> GetUpcomingSeason(SeasonQueryParameters queryParameters)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var queryString = BuildSeasonQueryString(queryParameters);
+            var requestUri = $"{JikanApiBaseUrl}seasons/upcoming{queryString}";
+
+            try
+            {
+                _logger.LogInformation("Requesting upcoming season anime from {RequestUri}", requestUri);
+                var response = await client.GetAsync(requestUri);
+
+                response.EnsureSuccessStatusCode();
+
+                var upcomingSeasonResponse = await response.Content.ReadFromJsonAsync<UpcomingSeasonResponse>();
+
+                if (upcomingSeasonResponse == null)
+                {
+                    _logger.LogWarning("Failed to deserialize upcoming season response from {RequestUri}", requestUri);
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully retrieved upcoming season anime from {RequestUri}", requestUri);
+                }
+
+                return upcomingSeasonResponse;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed when fetching upcoming season anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize Jikan API response for upcoming season anime from {RequestUri}", requestUri);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while fetching upcoming season anime from {RequestUri}", requestUri);
+                return null;
+            }
+        }
+
+        private string BuildSeasonQueryString(SeasonQueryParameters queryParams)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+
+            if (queryParams.Page.HasValue) query["page"] = queryParams.Page.Value.ToString();
+            if (queryParams.Limit.HasValue) query["limit"] = queryParams.Limit.Value.ToString();
+            if (queryParams.Filter.HasValue) query["filter"] = queryParams.Filter.Value.GetDescription();
+            if (queryParams.Sfw.HasValue && queryParams.Sfw.Value) query["sfw"] = null;
+            if (queryParams.Unapproved.HasValue && queryParams.Unapproved.Value) query["unapproved"] = null;
 
             string? queryString = query.ToString();
             return string.IsNullOrEmpty(queryString) ? string.Empty : $"?{queryString}";
