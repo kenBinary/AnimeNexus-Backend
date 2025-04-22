@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeList;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime
 {
     public class RandomAnimeResponse
     {
