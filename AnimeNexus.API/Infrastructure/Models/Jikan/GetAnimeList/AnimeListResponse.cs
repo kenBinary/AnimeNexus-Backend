@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.Common;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeList
 {
     public class AnimeListResponse
     {
