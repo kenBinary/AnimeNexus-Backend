@@ -1,7 +1,8 @@
-using AnimeNexus.API.Infrastructure.Models.Jikan;
-using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Features.Anime.DTO;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeFull;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeList;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 
 namespace backend.AnimeNexus.API.Features.Anime.Interfaces
 {
