@@ -1,6 +1,5 @@
 using backend.AnimeNexus.API.Features.Auth.Interfaces;
 using backend.AnimeNexus.API.Features.Auth.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AnimeNexus.API.Features.Auth

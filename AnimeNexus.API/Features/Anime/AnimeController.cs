@@ -3,22 +3,17 @@ using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
 using backend.AnimeNexus.API.Domain.DTO.Request;
 using backend.AnimeNexus.API.Features.Anime.DTO;
 using backend.AnimeNexus.API.Features.Anime.Interfaces;
-using backend.AnimeNexus.API.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.AnimeNexus.API.Features.Anime
 {
     [ApiController]
     [Route("api/anime")]
-    [Authorize]
     public class AnimeController : ControllerBase
     {
-        public readonly IJikanApiClient _jikanApiClient;
         public readonly IAnimeService _animeService;
-        public AnimeController(IJikanApiClient jikanApiClient, IAnimeService animeService)
+        public AnimeController(IAnimeService animeService)
         {
-            _jikanApiClient = jikanApiClient;
             _animeService = animeService;
         }
 
