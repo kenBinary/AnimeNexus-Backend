@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.Common;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations
 {
     public class RecommendationEntry
     {
