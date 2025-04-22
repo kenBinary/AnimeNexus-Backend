@@ -1,10 +1,11 @@
-using AnimeNexus.API.Infrastructure.Models.Jikan;
 using backend.AnimeNexus.API.Domain.DTO.Request;
-using AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
-using AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
 using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeProducer;
 using backend.AnimeNexus.API.Domain.DTOs.Request;
 using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeSeason;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeFull;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeList;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeRecommendations;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetRandomAnime;
 
 namespace backend.AnimeNexus.API.Infrastructure.Interfaces
 {
