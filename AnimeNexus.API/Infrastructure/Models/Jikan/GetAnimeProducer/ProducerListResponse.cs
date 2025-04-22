@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using AnimeNexus.API.Infrastructure.Models.Jikan;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.Common;
 
 namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeProducer
 {
