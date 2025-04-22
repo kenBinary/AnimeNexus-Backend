@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
-using AnimeNexus.API.Infrastructure.Models.Jikan;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.Common;
+using backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeList;
 
 
 namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeSeason
