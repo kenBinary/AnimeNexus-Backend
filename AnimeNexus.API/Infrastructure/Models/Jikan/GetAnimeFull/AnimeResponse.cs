@@ -1,10 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan;
-
-public class AnimeResponse
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeFull
 {
-    [JsonPropertyName("data")]
-    public required AnimeDataFull Data { get; set; }
+    public class AnimeResponse
+    {
+        [JsonPropertyName("data")]
+        public required AnimeDataFull Data { get; set; }
 
+    }
 }

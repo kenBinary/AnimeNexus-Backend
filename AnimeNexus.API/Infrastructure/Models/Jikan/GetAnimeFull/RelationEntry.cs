@@ -1,18 +1,19 @@
 using System.Text.Json.Serialization;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan;
-
-public class RelationEntry
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.GetAnimeFull
 {
-    [JsonPropertyName("mal_id")]
-    public int MalId { get; set; }
+    public class RelationEntry
+    {
+        [JsonPropertyName("mal_id")]
+        public int MalId { get; set; }
 
-    [JsonPropertyName("type")]
-    public required string Type { get; set; }
+        [JsonPropertyName("type")]
+        public required string Type { get; set; }
 
-    [JsonPropertyName("name")]
-    public required string Name { get; set; }
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
 
-    [JsonPropertyName("url")]
-    public required string Url { get; set; }
+        [JsonPropertyName("url")]
+        public required string Url { get; set; }
+    }
 }
