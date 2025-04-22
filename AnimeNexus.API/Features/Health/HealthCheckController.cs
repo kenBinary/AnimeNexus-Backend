@@ -8,7 +8,7 @@ namespace backend.AnimeNexus.API.Features.Health
     {
 
         [HttpGet("")]
-        public ActionResult<IActionResult> CheckHealth()
+        public IActionResult CheckHealth()
         {
             return Ok("API is up an running");
         }
