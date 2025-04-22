@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace AnimeNexus.API.Infrastructure.Models.Jikan
+namespace backend.AnimeNexus.API.Infrastructure.Models.Jikan.Common
 {
     public class PaginationItems
     {
