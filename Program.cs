@@ -19,6 +19,38 @@ using backend.AnimeNexus.API.Features.Season.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- CORS Configuration ---
+var corsConfigurationName = "_corsConfiguration";
+
+var allowedOrigins = builder.Configuration["CORS:ALLOWED_ORIGINS"]?.Split(',') ?? [];
+
+builder.Services.AddCors(options =>
+{
+    bool hasValidOrigin = allowedOrigins.Length > 0 && !string.IsNullOrWhiteSpace(allowedOrigins[0]);
+
+    if (!hasValidOrigin && (builder.Environment.IsProduction() || builder.Environment.IsStaging()))
+    {
+        throw new InvalidOperationException("CORS origins are not configured. Please set 'CORS:ALLOWED_ORIGINS' in appsettings for the Production environment.");
+
+    }
+    options.AddPolicy(name: corsConfigurationName,
+                      policy =>
+                      {
+                          if (hasValidOrigin)
+                          {
+                              policy.WithOrigins(allowedOrigins)
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod();
+                          }
+                          else
+                          {
+                              policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                          }
+                      });
+});
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -127,6 +159,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(corsConfigurationName);
 
 app.UseAuthentication();
 app.UseAuthorization();
