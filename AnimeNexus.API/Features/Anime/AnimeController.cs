@@ -126,8 +126,11 @@ namespace backend.AnimeNexus.API.Features.Anime
                 return BadRequest("An error occured while trying to request for the resource");
             }
 
-            // removes the first anime because for some reason there is a random anime in the beginning
-            animeList.Data.RemoveAt(0);
+            if (animeList.Data.Count > 0 && animeList.Data[0].Title != "Sousou no Frieren")
+            {
+                // removes the first anime because for some reason there is a random anime in the beginning
+                animeList.Data.RemoveAt(0);
+            }
 
             return Ok(animeList);
         }
@@ -162,7 +165,6 @@ namespace backend.AnimeNexus.API.Features.Anime
 
             return Ok(animeList);
         }
-
         [HttpGet("recommendations")]
         public async Task<ActionResult<RecommendationResponse>> GetAnimeRecommendations([FromQuery] int? page = null)
         {
